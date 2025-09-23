@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grade Calculator Platform</title>
+<link rel="stylesheet" href="project2.css">
+</head>
+<body>
+  <!-- Top Buttons -->
+  <div class="button-container">
+    <div id="loginIcon" class="side-icon">Login</div>
+    <div id="registerIcon" class="side-icon">Register</div>
+    <div id="logoutIcon" class="side-icon" style="display:none;">Logout</div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <label>Email</label>
+        <input type="email" name="email" required />
+
+        <label>Password</label>
+        <input type="password" name="password" required />
+
+        <button type="submit">Login</button>
+
+        <div class="switch-auth">
+          <p>Don’t have an account? <a href="#" id="goToRegister">Register here</a></p>
+        </div>
+
+        <div class="message" id="loginMessage"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <h2>Register</h2>
+      <form id="registerForm">
+        <label>Username</label>
+        <input type="text" name="username" required />
+
+        <label>Email</label>
+        <input type="email" name="email" required />
+
+        <label>Password</label>
+        <input type="password" name="password" required />
+
+        <button type="submit">Register</button>
+
+        <div class="switch-auth">
+          <p>Already have an account? <a href="#" id="goToLogin">Login here</a></p>
+        </div>
+
+        <div class="message" id="registerMessage"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgotPasswordModal" class="modal">
+    <div class="modal-content">
+      <h2>Forgot Password</h2>
+      <form id="forgotPasswordForm">
+        <label>Enter your email</label>
+        <input type="email" name="email" required />
+        <button type="submit">Recover Password</button>
+        <div class="message" id="forgotPasswordMessage"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Grade Section -->
+  <section id="gradeSection" style="display:none; text-align:center;">
+    <h2>Welcome, <span id="userNameDisplay"></span> 🎓</h2>
+    <h3>CGPA Calculator</h3>
+
+    <form id="cgpaForm">
+      <div id="subjectsContainer">
+        <div class="subject">
+          <input type="text" name="subject[]" placeholder="Subject Name" required>
+          <input type="number" name="credits[]" placeholder="Credits" min="1" required>
+          <select name="grade[]" required>
+            <option value="">Select Grade</option>
+            <option value="10">A+</option>
+            <option value="9">A</option>
+            <option value="8">B+</option>
+            <option value="7">B</option>
+            <option value="6">C+</option>
+            <option value="5">C</option>
+            <option value="4">D</option>
+            <option value="3">E</option>
+            <option value="2">F</option>
+          </select>
+        </div>
+      </div>
+      <button type="button" id="addSubject">+ Add Subject</button>
+      <button type="submit">Calculate CGPA</button>
+    </form>
+
+    <h3 id="cgpaResult"></h3>
+  </section>
+
+<script src="project2.js"></script>
+</body>
+</html>
