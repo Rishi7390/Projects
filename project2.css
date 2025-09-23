@@ -191,6 +191,25 @@ body {
   background: linear-gradient(to right, #ff5722, #ff9800);
   transform: scale(1.05);
 }
+.removeSubject {
+  background-color: #e74c3c; /* red color */
+  border: none;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 1;
+  padding: 5px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  align-self: center; /* vertically center in flex row */
+  user-select: none;
+}
+
+.removeSubject:hover {
+  background-color: #c0392b; /* darker red on hover */
+}
+
 
 /* Calculate Button */
 #cgpaForm button[type="submit"] {
@@ -262,6 +281,7 @@ body {
     right: 10px;
   }
 }
+
 
 
 
