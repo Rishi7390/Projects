@@ -46,11 +46,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showInitialModal() {
     hideAllModals();
-    const username = localStorage.getItem("username");
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-
-    if (isLoggedIn && username) {
-      showGradeSection(username);
+    const users = JSON.parse(localStorage.getItem("users") || "{}");
+    const loggedInEmail = localStorage.getItem("loggedInEmail");
+    if (loggedInEmail && users[loggedInEmail]) {
+      showGradeSection(users[loggedInEmail].username);
     } else {
       showButtonsForLoggedOut();
       loginModal.style.display = "flex";
@@ -63,8 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
   registerIcon.onclick = () => { hideAllModals(); registerModal.style.display = "flex"; };
   logoutIcon.onclick = () => {
     gradeSection.style.display = "none";
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("username");
+    localStorage.removeItem("loggedInEmail");
     showButtonsForLoggedOut();
     showInitialModal();
   };
@@ -78,13 +76,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const password = e.target.password.value.trim();
       if (!username || !email || !password) return;
 
-      // Save user info in localStorage (simple demo, not secure)
-      localStorage.setItem("registeredUser", JSON.stringify({ username, email, password }));
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("username", username);
+      let users = JSON.parse(localStorage.getItem("users") || "{}");
+      if (users[email]) {
+        const registerMsg = document.getElementById("registerMessage");
+        if (registerMsg) {
+          registerMsg.textContent = "Email already registered.";
+          registerMsg.style.color = "red";
+        }
+        return;
+      }
+      users[email] = { username, password };
+      localStorage.setItem("users", JSON.stringify(users));
+      localStorage.setItem("loggedInEmail", email);
 
       hideAllModals();
       showGradeSection(username);
+      registerForm.reset();
       alert("Registered and logged in successfully!");
     });
   }
@@ -96,23 +103,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const email = e.target.email.value.trim();
       const password = e.target.password.value.trim();
 
-      const user = localStorage.getItem("registeredUser");
-      if (user) {
-        const parsedUser = JSON.parse(user);
-        if (parsedUser.email === email && parsedUser.password === password) {
-          localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem("username", parsedUser.username);
-          hideAllModals();
-          showGradeSection(parsedUser.username);
-          return;
-        }
-      }
-      const loginMsg = document.getElementById("loginMessage");
-      if (loginMsg) {
-        loginMsg.textContent = "Invalid email or password.";
-        loginMsg.style.color = "red";
+      const users = JSON.parse(localStorage.getItem("users") || "{}");
+
+      if (users[email] && users[email].password === password) {
+        localStorage.setItem("loggedInEmail", email);
+        hideAllModals();
+        showGradeSection(users[email].username);
+        loginForm.reset();
+        const loginMsg = document.getElementById("loginMessage");
+        if (loginMsg) loginMsg.textContent = "";
       } else {
-        alert("Invalid email or password.");
+        const loginMsg = document.getElementById("loginMessage");
+        if (loginMsg) {
+          loginMsg.textContent = "Invalid email or password.";
+          loginMsg.style.color = "red";
+        } else {
+          alert("Invalid email or password.");
+        }
       }
     });
   }
@@ -132,17 +139,14 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const email = e.target.email.value.trim();
 
-      const user = localStorage.getItem("registeredUser");
-      if (user) {
-        const parsedUser = JSON.parse(user);
-        if (parsedUser.email === email) {
-          alert(`Password recovery: Your password is '${parsedUser.password}'`);
-          hideAllModals();
-          loginModal.style.display = "flex";
-          return;
-        }
+      const users = JSON.parse(localStorage.getItem("users") || "{}");
+      if (users[email]) {
+        alert(`Password recovery: Your password is '${users[email].password}'`);
+        hideAllModals();
+        loginModal.style.display = "flex";
+      } else {
+        alert("Email not found.");
       }
-      alert("Email not found.");
     });
   }
 
