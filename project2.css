@@ -12,9 +12,6 @@ body {
   min-height: 100vh;
 }
 
-/* ============================= */
-/* Button Container (Login/Register/Logout) */
-/* ============================= */
 .button-container {
   position: fixed;
   top: 20px;
@@ -37,6 +34,7 @@ body {
 .side-icon:hover {
   transform: scale(1.05);
 }
+
 
 /* ============================= */
 /* Modal (Login/Register/Forgot Password) */
@@ -276,4 +274,5 @@ body {
     right: 10px;
   }
 }
+
 
