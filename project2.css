@@ -1,4 +1,4 @@
-/* ============================= */
+  /* ============================= */
 /* Background & General Layout   */
 /* ============================= */
 body {
@@ -50,10 +50,27 @@ body {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+
+  /* Flex centering */
+  display: flex !important; /* make sure flex is active */
+  justify-content: center !important;
+  align-items: center !important;
 }
+
+/* Modal box */
+.modal-content {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  width: 350px;
+  max-width: 90vw; /* responsive */
+  text-align: left;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
+  animation: popIn 0.3s ease-in-out;
+  box-sizing: border-box; /* ensure padding included */
+  position: relative; /* for z-index context */
+}
+
 
 /* Modal box */
 .modal-content {
@@ -259,3 +276,4 @@ body {
     right: 10px;
   }
 }
+
