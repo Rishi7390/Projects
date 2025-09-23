@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  const API_URL = "  https://cb2e2152c1dd.ngrok-free.app ";
-
   const loginIcon = document.getElementById("loginIcon");
   const registerIcon = document.getElementById("registerIcon");
   const logoutIcon = document.getElementById("logoutIcon");
@@ -73,69 +71,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===== Register Form =====
   if (registerForm) {
-    registerForm.addEventListener("submit", async (e) => {
+    registerForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const username = e.target.username.value.trim();
       const email = e.target.email.value.trim();
       const password = e.target.password.value.trim();
       if (!username || !email || !password) return;
 
-      try {
-        const res = await fetch(`${API_URL}/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, email, password })
-        });
+      // Save user info in localStorage (simple demo, not secure)
+      localStorage.setItem("registeredUser", JSON.stringify({ username, email, password }));
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("username", username);
 
-        const data = await res.json();
-
-        if (res.ok) {
-          localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem("username", username);
-          hideAllModals();
-          showGradeSection(username);
-        }
-        alert(data.message);
-      } catch (err) {
-        console.error("Register Error:", err);
-        alert("Cannot reach server. Make sure Flask is running.");
-      }
+      hideAllModals();
+      showGradeSection(username);
+      alert("Registered and logged in successfully!");
     });
   }
 
   // ===== Login Form =====
   if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
+    loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const email = e.target.email.value.trim();
       const password = e.target.password.value.trim();
 
-      try {
-        const res = await fetch(`${API_URL}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
+      const user = localStorage.getItem("registeredUser");
+      if (user) {
+        const parsedUser = JSON.parse(user);
+        if (parsedUser.email === email && parsedUser.password === password) {
           localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem("username", data.username);
+          localStorage.setItem("username", parsedUser.username);
           hideAllModals();
-          showGradeSection(data.username);
-        } else {
-          const loginMsg = document.getElementById("loginMessage");
-          if (loginMsg) {
-            loginMsg.textContent = data.message;
-            loginMsg.style.color = "red";
-          } else {
-            alert(data.message);
-          }
+          showGradeSection(parsedUser.username);
+          return;
         }
-      } catch (err) {
-        console.error("Login Error:", err);
-        alert("Cannot reach server. Make sure Flask is running.");
+      }
+      const loginMsg = document.getElementById("loginMessage");
+      if (loginMsg) {
+        loginMsg.textContent = "Invalid email or password.";
+        loginMsg.style.color = "red";
+      } else {
+        alert("Invalid email or password.");
       }
     });
   }
@@ -151,29 +128,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (forgotPasswordForm) {
-    forgotPasswordForm.addEventListener("submit", async (e) => {
+    forgotPasswordForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const email = e.target.email.value.trim();
 
-      try {
-        const res = await fetch(`${API_URL}/forgot-password`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
-        });
-
-        const data = await res.json();
-
-        alert(data.message);
-
-        if (res.ok) {
+      const user = localStorage.getItem("registeredUser");
+      if (user) {
+        const parsedUser = JSON.parse(user);
+        if (parsedUser.email === email) {
+          alert(`Password recovery: Your password is '${parsedUser.password}'`);
           hideAllModals();
           loginModal.style.display = "flex";
+          return;
         }
-      } catch (err) {
-        console.error("Forgot Password Error:", err);
-        alert("Cannot reach server. Make sure Flask is running.");
       }
+      alert("Email not found.");
     });
   }
 
