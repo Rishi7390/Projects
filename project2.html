@@ -15,7 +15,7 @@
   </div>
 
   <!-- Login Modal -->
-  <div id="loginModal" class="modal">
+  <div id="loginModal" class="modal" style="display:none;">
     <div class="modal-content">
       <h2>Login</h2>
       <form id="loginForm">
@@ -37,7 +37,7 @@
   </div>
 
   <!-- Register Modal -->
-  <div id="registerModal" class="modal">
+  <div id="registerModal" class="modal" style="display:none;">
     <div class="modal-content">
       <h2>Register</h2>
       <form id="registerForm">
@@ -57,19 +57,6 @@
         </div>
 
         <div class="message" id="registerMessage"></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Forgot Password Modal -->
-  <div id="forgotPasswordModal" class="modal">
-    <div class="modal-content">
-      <h2>Forgot Password</h2>
-      <form id="forgotPasswordForm">
-        <label>Enter your email</label>
-        <input type="email" name="email" required />
-        <button type="submit">Recover Password</button>
-        <div class="message" id="forgotPasswordMessage"></div>
       </form>
     </div>
   </div>
@@ -105,6 +92,167 @@
     <h3 id="cgpaResult"></h3>
   </section>
 
-<script src="project2.js"></script>
+<script>
+  // LocalStorage helpers
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('users') || '{}');
+  }
+  function saveUsers(users) {
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+  // UI elements
+  const loginIcon = document.getElementById('loginIcon');
+  const registerIcon = document.getElementById('registerIcon');
+  const logoutIcon = document.getElementById('logoutIcon');
+
+  const loginModal = document.getElementById('loginModal');
+  const registerModal = document.getElementById('registerModal');
+
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+
+  const loginMessage = document.getElementById('loginMessage');
+  const registerMessage = document.getElementById('registerMessage');
+
+  const gradeSection = document.getElementById('gradeSection');
+  const userNameDisplay = document.getElementById('userNameDisplay');
+
+  // Show/hide modals
+  loginIcon.onclick = () => {
+    loginModal.style.display = 'block';
+    registerModal.style.display = 'none';
+  };
+  registerIcon.onclick = () => {
+    registerModal.style.display = 'block';
+    loginModal.style.display = 'none';
+  };
+  document.getElementById('goToRegister').onclick = (e) => {
+    e.preventDefault();
+    registerModal.style.display = 'block';
+    loginModal.style.display = 'none';
+  };
+  document.getElementById('goToLogin').onclick = (e) => {
+    e.preventDefault();
+    loginModal.style.display = 'block';
+    registerModal.style.display = 'none';
+  };
+
+  logoutIcon.onclick = () => {
+    localStorage.removeItem('currentUser');
+    logoutIcon.style.display = 'none';
+    loginIcon.style.display = 'inline-block';
+    registerIcon.style.display = 'inline-block';
+    gradeSection.style.display = 'none';
+  };
+
+  // Register handler
+  registerForm.onsubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(registerForm);
+    const username = formData.get('username').trim();
+    const email = formData.get('email').trim();
+    const password = formData.get('password');
+
+    const users = getUsers();
+    if (users[email]) {
+      registerMessage.textContent = 'Email already registered.';
+      return;
+    }
+    users[email] = { username, password };
+    saveUsers(users);
+    registerMessage.style.color = 'green';
+    registerMessage.textContent = 'Registration successful! You can login now.';
+    registerForm.reset();
+  };
+
+  // Login handler
+  loginForm.onsubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(loginForm);
+    const email = formData.get('email').trim();
+    const password = formData.get('password');
+
+    const users = getUsers();
+    if (!users[email]) {
+      loginMessage.textContent = 'No user found with this email.';
+      return;
+    }
+    if (users[email].password !== password) {
+      loginMessage.textContent = 'Incorrect password.';
+      return;
+    }
+    loginMessage.textContent = '';
+    localStorage.setItem('currentUser', JSON.stringify({email, username: users[email].username}));
+    showLoggedIn(users[email].username);
+    loginModal.style.display = 'none';
+    loginForm.reset();
+  };
+
+  // Show logged-in UI
+  function showLoggedIn(username) {
+    userNameDisplay.textContent = username;
+    gradeSection.style.display = 'block';
+    loginIcon.style.display = 'none';
+    registerIcon.style.display = 'none';
+    logoutIcon.style.display = 'inline-block';
+  }
+
+  // Load user on page load
+  window.onload = () => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser) {
+      showLoggedIn(currentUser.username);
+    }
+  };
+
+  // Add new subject input
+  const subjectsContainer = document.getElementById('subjectsContainer');
+  document.getElementById('addSubject').onclick = () => {
+    const div = document.createElement('div');
+    div.className = 'subject';
+    div.innerHTML = `
+      <input type="text" name="subject[]" placeholder="Subject Name" required>
+      <input type="number" name="credits[]" placeholder="Credits" min="1" required>
+      <select name="grade[]" required>
+        <option value="">Select Grade</option>
+        <option value="10">A+</option>
+        <option value="9">A</option>
+        <option value="8">B+</option>
+        <option value="7">B</option>
+        <option value="6">C+</option>
+        <option value="5">C</option>
+        <option value="4">D</option>
+        <option value="3">E</option>
+        <option value="2">F</option>
+      </select>`;
+    subjectsContainer.appendChild(div);
+  };
+
+  // CGPA calculation logic
+  document.getElementById('cgpaForm').onsubmit = (e) => {
+    e.preventDefault();
+    const subjects = document.getElementsByName('subject[]');
+    const credits = document.getElementsByName('credits[]');
+    const grades = document.getElementsByName('grade[]');
+
+    let totalCredits = 0;
+    let totalPoints = 0;
+
+    for (let i = 0; i < subjects.length; i++) {
+      const credit = Number(credits[i].value);
+      const grade = Number(grades[i].value);
+      if (!credit || !grade) {
+        alert('Please fill all fields correctly.');
+        return;
+      }
+      totalCredits += credit;
+      totalPoints += credit * grade;
+    }
+
+    const cgpa = (totalPoints / totalCredits).toFixed(2);
+    document.getElementById('cgpaResult').textContent = `Your CGPA is: ${cgpa}`;
+  };
+</script>
 </body>
 </html>
