@@ -14,20 +14,30 @@
     <form id="cgpaForm">
       <div id="subjectsContainer">
         <div class="subject">
-          <input type="text" name="subject[]" placeholder="Subject Name" required />
-          <input type="number" name="credits[]" placeholder="Credits" min="1" required />
-          <select name="grade[]" required>
-            <option value="">Select Grade</option>
-            <option value="10">A+</option>
-            <option value="9">A</option>
-            <option value="8">B+</option>
-            <option value="7">B</option>
-            <option value="6">C+</option>
-            <option value="5">C</option>
-            <option value="4">D</option>
-            <option value="3">E</option>
-            <option value="2">F</option>
-          </select>
+          <label>
+            Subject Name
+            <input type="text" name="subject[]" placeholder="Enter subject name" required />
+          </label>
+          <label>
+            Credits
+            <input type="number" name="credits[]" placeholder="Enter credits" min="1" required />
+          </label>
+          <label>
+            Grade
+            <select name="grade[]" required>
+              <option value="">Select Grade</option>
+              <option value="10">A+</option>
+              <option value="9">A</option>
+              <option value="8">B+</option>
+              <option value="7">B</option>
+              <option value="6">C+</option>
+              <option value="5">C</option>
+              <option value="4">D</option>
+              <option value="3">E</option>
+              <option value="2">F</option>
+            </select>
+          </label>
+          <button type="button" class="removeSubject" title="Remove subject">Remove</button>
         </div>
       </div>
       <button type="button" id="addSubject">+ Add Subject</button>
@@ -43,26 +53,51 @@
   const cgpaForm = document.getElementById("cgpaForm");
   const cgpaResult = document.getElementById("cgpaResult");
 
-  addSubjectBtn.addEventListener("click", () => {
+  function createSubjectElement() {
     const div = document.createElement("div");
     div.classList.add("subject");
     div.innerHTML = `
-      <input type="text" name="subject[]" placeholder="Subject Name" required />
-      <input type="number" name="credits[]" placeholder="Credits" min="1" required />
-      <select name="grade[]" required>
-        <option value="">Select Grade</option>
-        <option value="10">A+</option>
-        <option value="9">A</option>
-        <option value="8">B+</option>
-        <option value="7">B</option>
-        <option value="6">C+</option>
-        <option value="5">C</option>
-        <option value="4">D</option>
-        <option value="3">E</option>
-        <option value="2">F</option>
-      </select>
+      <label>
+        Subject Name
+        <input type="text" name="subject[]" placeholder="Enter subject name" required />
+      </label>
+      <label>
+        Credits
+        <input type="number" name="credits[]" placeholder="Enter credits" min="1" required />
+      </label>
+      <label>
+        Grade
+        <select name="grade[]" required>
+          <option value="">Select Grade</option>
+          <option value="10">A+</option>
+          <option value="9">A</option>
+          <option value="8">B+</option>
+          <option value="7">B</option>
+          <option value="6">C+</option>
+          <option value="5">C</option>
+          <option value="4">D</option>
+          <option value="3">E</option>
+          <option value="2">F</option>
+        </select>
+      </label>
+      <button type="button" class="removeSubject" title="Remove subject">Remove</button>
     `;
-    subjectsContainer.appendChild(div);
+    return div;
+  }
+
+  // Add subject button click
+  addSubjectBtn.addEventListener("click", () => {
+    const newSubject = createSubjectElement();
+    subjectsContainer.appendChild(newSubject);
+    cgpaResult.textContent = ""; // clear result when adding subjects
+  });
+
+  // Remove subject buttons (event delegation)
+  subjectsContainer.addEventListener("click", (e) => {
+    if (e.target.classList.contains("removeSubject")) {
+      e.target.parentElement.remove();
+      cgpaResult.textContent = ""; // clear result when removing subjects
+    }
   });
 
   cgpaForm.addEventListener("submit", (e) => {
@@ -91,5 +126,3 @@
 </script>
 </body>
 </html>
-
-
