@@ -4,73 +4,49 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Grade Calculator Platform</title>
-<link rel="stylesheet" href="project2.css">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+  }
+  h2, h3 {
+    text-align: center;
+  }
+  #subjectsContainer .subject {
+    margin-bottom: 15px;
+  }
+  input, select, button {
+    padding: 8px;
+    margin: 5px 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  button {
+    width: auto;
+    cursor: pointer;
+  }
+  #addSubject {
+    margin-bottom: 20px;
+  }
+  #cgpaResult {
+    font-size: 1.2em;
+    margin-top: 20px;
+    text-align: center;
+  }
+</style>
 </head>
 <body>
-  <!-- Top Buttons -->
-  <div class="button-container">
-    <div id="loginIcon" class="side-icon">Login</div>
-    <div id="registerIcon" class="side-icon">Register</div>
-    <div id="logoutIcon" class="side-icon" style="display:none;">Logout</div>
-  </div>
-
-  <!-- Login Modal -->
-  <div id="loginModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <h2>Login</h2>
-      <form id="loginForm">
-        <label>Email</label>
-        <input type="email" name="email" required />
-
-        <label>Password</label>
-        <input type="password" name="password" required />
-
-        <button type="submit">Login</button>
-
-        <div class="switch-auth">
-          <p>Don’t have an account? <a href="#" id="goToRegister">Register here</a></p>
-        </div>
-
-        <div class="message" id="loginMessage"></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Register Modal -->
-  <div id="registerModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <h2>Register</h2>
-      <form id="registerForm">
-        <label>Username</label>
-        <input type="text" name="username" required />
-
-        <label>Email</label>
-        <input type="email" name="email" required />
-
-        <label>Password</label>
-        <input type="password" name="password" required />
-
-        <button type="submit">Register</button>
-
-        <div class="switch-auth">
-          <p>Already have an account? <a href="#" id="goToLogin">Login here</a></p>
-        </div>
-
-        <div class="message" id="registerMessage"></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Grade Section -->
-  <section id="gradeSection" style="display:none; text-align:center;">
-    <h2>Welcome, <span id="userNameDisplay"></span> 🎓</h2>
-    <h3>CGPA Calculator</h3>
+  <!-- Grade Section (always visible) -->
+  <section id="gradeSection" style="text-align:center;">
+    <h2>CGPA Calculator</h2>
 
     <form id="cgpaForm">
       <div id="subjectsContainer">
         <div class="subject">
-          <input type="text" name="subject[]" placeholder="Subject Name" required>
-          <input type="number" name="credits[]" placeholder="Credits" min="1" required>
+          <input type="text" name="subject[]" placeholder="Subject Name" required />
+          <input type="number" name="credits[]" placeholder="Credits" min="1" required />
           <select name="grade[]" required>
             <option value="">Select Grade</option>
             <option value="10">A+</option>
@@ -93,127 +69,17 @@
   </section>
 
 <script>
-  // LocalStorage helpers
-  function getUsers() {
-    return JSON.parse(localStorage.getItem('users') || '{}');
-  }
-  function saveUsers(users) {
-    localStorage.setItem('users', JSON.stringify(users));
-  }
+  const subjectsContainer = document.getElementById("subjectsContainer");
+  const addSubjectBtn = document.getElementById("addSubject");
+  const cgpaForm = document.getElementById("cgpaForm");
+  const cgpaResult = document.getElementById("cgpaResult");
 
-  // UI elements
-  const loginIcon = document.getElementById('loginIcon');
-  const registerIcon = document.getElementById('registerIcon');
-  const logoutIcon = document.getElementById('logoutIcon');
-
-  const loginModal = document.getElementById('loginModal');
-  const registerModal = document.getElementById('registerModal');
-
-  const loginForm = document.getElementById('loginForm');
-  const registerForm = document.getElementById('registerForm');
-
-  const loginMessage = document.getElementById('loginMessage');
-  const registerMessage = document.getElementById('registerMessage');
-
-  const gradeSection = document.getElementById('gradeSection');
-  const userNameDisplay = document.getElementById('userNameDisplay');
-
-  // Show/hide modals
-  loginIcon.onclick = () => {
-    loginModal.style.display = 'block';
-    registerModal.style.display = 'none';
-  };
-  registerIcon.onclick = () => {
-    registerModal.style.display = 'block';
-    loginModal.style.display = 'none';
-  };
-  document.getElementById('goToRegister').onclick = (e) => {
-    e.preventDefault();
-    registerModal.style.display = 'block';
-    loginModal.style.display = 'none';
-  };
-  document.getElementById('goToLogin').onclick = (e) => {
-    e.preventDefault();
-    loginModal.style.display = 'block';
-    registerModal.style.display = 'none';
-  };
-
-  logoutIcon.onclick = () => {
-    localStorage.removeItem('currentUser');
-    logoutIcon.style.display = 'none';
-    loginIcon.style.display = 'inline-block';
-    registerIcon.style.display = 'inline-block';
-    gradeSection.style.display = 'none';
-  };
-
-  // Register handler
-  registerForm.onsubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(registerForm);
-    const username = formData.get('username').trim();
-    const email = formData.get('email').trim();
-    const password = formData.get('password');
-
-    const users = getUsers();
-    if (users[email]) {
-      registerMessage.textContent = 'Email already registered.';
-      return;
-    }
-    users[email] = { username, password };
-    saveUsers(users);
-    registerMessage.style.color = 'green';
-    registerMessage.textContent = 'Registration successful! You can login now.';
-    registerForm.reset();
-  };
-
-  // Login handler
-  loginForm.onsubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(loginForm);
-    const email = formData.get('email').trim();
-    const password = formData.get('password');
-
-    const users = getUsers();
-    if (!users[email]) {
-      loginMessage.textContent = 'No user found with this email.';
-      return;
-    }
-    if (users[email].password !== password) {
-      loginMessage.textContent = 'Incorrect password.';
-      return;
-    }
-    loginMessage.textContent = '';
-    localStorage.setItem('currentUser', JSON.stringify({email, username: users[email].username}));
-    showLoggedIn(users[email].username);
-    loginModal.style.display = 'none';
-    loginForm.reset();
-  };
-
-  // Show logged-in UI
-  function showLoggedIn(username) {
-    userNameDisplay.textContent = username;
-    gradeSection.style.display = 'block';
-    loginIcon.style.display = 'none';
-    registerIcon.style.display = 'none';
-    logoutIcon.style.display = 'inline-block';
-  }
-
-  // Load user on page load
-  window.onload = () => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUser) {
-      showLoggedIn(currentUser.username);
-    }
-  };
-
-  // Add new subject input
-  const subjectsContainer = document.getElementById('subjectsContainer');
-  document.getElementById('addSubject').onclick = () => {
-    const div = document.createElement('div');
-    div.className = 'subject';
+  addSubjectBtn.addEventListener("click", () => {
+    const div = document.createElement("div");
+    div.classList.add("subject");
     div.innerHTML = `
-      <input type="text" name="subject[]" placeholder="Subject Name" required>
-      <input type="number" name="credits[]" placeholder="Credits" min="1" required>
+      <input type="text" name="subject[]" placeholder="Subject Name" required />
+      <input type="number" name="credits[]" placeholder="Credits" min="1" required />
       <select name="grade[]" required>
         <option value="">Select Grade</option>
         <option value="10">A+</option>
@@ -225,34 +91,34 @@
         <option value="4">D</option>
         <option value="3">E</option>
         <option value="2">F</option>
-      </select>`;
+      </select>
+    `;
     subjectsContainer.appendChild(div);
-  };
+  });
 
-  // CGPA calculation logic
-  document.getElementById('cgpaForm').onsubmit = (e) => {
+  cgpaForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    const subjects = document.getElementsByName('subject[]');
-    const credits = document.getElementsByName('credits[]');
-    const grades = document.getElementsByName('grade[]');
+    const credits = [...document.getElementsByName("credits[]")].map(c => Number(c.value));
+    const grades = [...document.getElementsByName("grade[]")].map(g => Number(g.value));
 
-    let totalCredits = 0;
-    let totalPoints = 0;
-
-    for (let i = 0; i < subjects.length; i++) {
-      const credit = Number(credits[i].value);
-      const grade = Number(grades[i].value);
-      if (!credit || !grade) {
-        alert('Please fill all fields correctly.');
-        return;
-      }
-      totalCredits += credit;
-      totalPoints += credit * grade;
+    let totalCredits = 0, totalPoints = 0, hasFail = false;
+    for (let i = 0; i < credits.length; i++) {
+      totalCredits += credits[i];
+      totalPoints += credits[i] * grades[i];
+      if (grades[i] <= 2) hasFail = true;
     }
 
-    const cgpa = (totalPoints / totalCredits).toFixed(2);
-    document.getElementById('cgpaResult').textContent = `Your CGPA is: ${cgpa}`;
-  };
+    if (totalCredits > 0) {
+      const cgpa = (totalPoints / totalCredits).toFixed(2);
+      cgpaResult.textContent = hasFail
+        ? `Your CGPA is: ${cgpa} ⚠️ (Fail in one or more subjects)`
+        : `Your CGPA is: ${cgpa}`;
+      cgpaResult.style.color = hasFail ? "red" : "green";
+    } else {
+      cgpaResult.textContent = "Please enter valid subjects.";
+      cgpaResult.style.color = "black";
+    }
+  });
 </script>
 </body>
 </html>
