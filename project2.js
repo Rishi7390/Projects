@@ -26,8 +26,8 @@ function createSubjectElement() {
         <option value="6">C+</option>
         <option value="5">C</option>
         <option value="4">D</option>
-        <option value="3">E</option>
-        <option value="2">F</option>
+        <option value="0">E</option>
+        <option value="0">F</option>
       </select>
     </label>
     <button type="button" class="removeSubject" title="Remove Subject">-</button>
@@ -74,3 +74,4 @@ cgpaForm.addEventListener("submit", (e) => {
     cgpaResult.style.color = "black";
   }
 });
+
